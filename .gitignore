@@ -72,3 +72,5 @@ build/linux/
 
 # Exceptions to keep
 !pubspec.lock
+
+notes/
