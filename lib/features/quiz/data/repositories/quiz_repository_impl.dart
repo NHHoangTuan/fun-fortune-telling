@@ -3,8 +3,7 @@ import '../../domain/entities/quiz_result_entity.dart';
 import '../../domain/repositories/quiz_repository.dart';
 import '../datasources/quiz_local_datasource.dart';
 import '../datasources/quiz_static_data.dart';
-import '../models/option_model.dart';
-import '../models/question_model.dart';
+
 import '../models/quiz_model.dart';
 import '../models/quiz_result_model.dart';
 
@@ -78,7 +77,7 @@ class QuizRepositoryImpl implements QuizRepository {
 
   // ─── Private helper ───
 
-  /// Parse từ Map<String, dynamic> (JSON) → QuizEntity.
+  /// Parse từ Map&lt;String, dynamic&gt; (JSON) → QuizEntity.
   /// Logic parse nằm ở đây trong Repository, không rò rỉ ra Use Case hay UI.
   QuizEntity _parseQuizMap(Map<String, dynamic> map) {
     // Chuyển đổi nested map về đúng chuẩn Map<String, dynamic> cho json_serializable
@@ -105,6 +104,10 @@ class QuizRepositoryImpl implements QuizRepository {
         return kPersonalityResults;
       case 'quiz_career_01':
         return kCareerResults;
+      case 'quiz_zodiac_01':
+        return kZodiacResults;
+      case 'quiz_friend_01':
+        return kFriendResults;
       default:
         return const {};
     }

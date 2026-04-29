@@ -35,9 +35,30 @@ class QuizHistoryScreen extends ConsumerWidget {
         ),
         data: (history) {
           if (history.isEmpty) {
-            return const Center(
-              child: Text('Chưa có kết quả nào.',
-                  style: TextStyle(color: AppColors.textMuted)),
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🕰️', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 10),
+                    const Text('Chưa có kết quả nào.',
+                        style: TextStyle(color: AppColors.textMuted)),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: () => context.go('/home'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: BorderSide(
+                          color: AppColors.primary.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      child: const Text('Làm quiz ngay'),
+                    ),
+                  ],
+                ),
+              ),
             );
           }
 

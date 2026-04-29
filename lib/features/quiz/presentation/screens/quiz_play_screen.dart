@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -53,11 +54,7 @@ class QuizPlayScreen extends ConsumerWidget {
         title: const Text('Làm quiz'),
       ),
       body: quizAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-          ),
-        ),
+        loading: () => const _PlaySkeleton(),
         error: (err, _) => Center(
           child: Text('$err',
               style: const TextStyle(color: AppColors.textSecondary)),
@@ -155,7 +152,11 @@ class _OptionCard extends StatelessWidget {
     final isSelected = selectedValue == option.value;
 
     return GestureDetector(
-      onTap: () => onTap(option.value),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        SystemSound.play(SystemSoundType.click);
+        onTap(option.value);
+      },
       child: AnimatedScale(
         duration: const Duration(milliseconds: 160),
         scale: isSelected ? 1.02 : 1.0,
@@ -191,6 +192,62 @@ class _OptionCard extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PlaySkeleton extends StatelessWidget {
+  const _PlaySkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 70,
+            height: 14,
+            decoration: BoxDecoration(
+              color: AppColors.bgCard,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 8,
+            decoration: BoxDecoration(
+              color: AppColors.bgCard,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            height: 28,
+            decoration: BoxDecoration(
+              color: AppColors.bgCard,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Expanded(
+            child: ListView.separated(
+              itemCount: 4,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (_, __) => Container(
+                height: 58,
+                decoration: BoxDecoration(
+                  color: AppColors.bgCard,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
