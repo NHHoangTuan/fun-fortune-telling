@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/quiz/presentation/screens/home_screen.dart';
+import '../../features/quiz/presentation/screens/quiz_detail_screen.dart';
+import '../../features/quiz/presentation/screens/quiz_history_screen.dart';
+import '../../features/quiz/presentation/screens/quiz_play_screen.dart';
+import '../../features/quiz/presentation/screens/quiz_result_screen.dart';
 import '../../features/quiz/presentation/screens/splash_screen.dart';
+import '../../features/quiz/domain/entities/quiz_result_entity.dart';
 
 /// GoRouter ẩn boilerplate của Navigator 2.0, cho phép định nghĩa route theo URL.
 /// Hỗ trợ deep link, redirect, và nested routes gọn hơn nhiều.
@@ -27,7 +32,7 @@ final appRouter = GoRouter(
           name: 'quiz-detail',
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return Scaffold(body: Center(child: Text('Quiz Detail: $id')));
+            return QuizDetailScreen(quizId: id);
           },
           routes: [
             GoRoute(
@@ -35,7 +40,7 @@ final appRouter = GoRouter(
               name: 'quiz-play',
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
-                return Scaffold(body: Center(child: Text('Play: $id')));
+                return QuizPlayScreen(quizId: id);
               },
             ),
           ],
@@ -46,14 +51,18 @@ final appRouter = GoRouter(
           /// Nhận: state.extra as QuizResultEntity
           path: 'result',
           name: 'quiz-result',
-          builder: (_, __) =>
-              const Scaffold(body: Center(child: Text('Result'))),
+          builder: (_, state) {
+            final result = state.extra as QuizResultEntity?;
+            if (result == null) {
+              return const Scaffold(body: Center(child: Text('Result')));
+            }
+            return QuizResultScreen(result: result);
+          },
         ),
         GoRoute(
           path: 'history',
           name: 'history',
-          builder: (_, __) =>
-              const Scaffold(body: Center(child: Text('History'))),
+          builder: (_, __) => const QuizHistoryScreen(),
         ),
       ],
     ),

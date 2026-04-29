@@ -31,12 +31,16 @@ abstract class QuizLocalDataSource {
 
   /// Lấy toàn bộ lịch sử kết quả, sắp xếp theo thời gian mới nhất.
   Future<List<QuizResultModel>> getHistory();
+
+  /// Xoá một kết quả khỏi Hive Box.
+  Future<void> deleteResult(QuizResultModel model);
 }
 
 class QuizLocalDataSourceImpl implements QuizLocalDataSource {
   /// Lấy Box đã được mở từ trước (phải gọi Hive.openBox ở main.dart trước).
   /// Không mở Box ở đây để tránh async trong constructor.
-  Box<QuizResultModel> get _box => Hive.box<QuizResultModel>(kQuizResultBoxName);
+  Box<QuizResultModel> get _box =>
+      Hive.box<QuizResultModel>(kQuizResultBoxName);
 
   @override
   Future<void> saveResult(QuizResultModel model) async {
@@ -51,5 +55,21 @@ class QuizLocalDataSourceImpl implements QuizLocalDataSource {
     // Sắp xếp mới nhất lên đầu
     results.sort((a, b) => b.savedAt.compareTo(a.savedAt));
     return results;
+  }
+
+  @override
+  Future<void> deleteResult(QuizResultModel model) async {
+    final entries = _box.toMap().entries.toList();
+    for (final entry in entries) {
+      final value = entry.value;
+      if (value.quizId == model.quizId &&
+          value.resultKey == model.resultKey &&
+          value.title == model.title &&
+          value.description == model.description &&
+          value.emoji == model.emoji) {
+        await _box.delete(entry.key);
+        break;
+      }
+    }
   }
 }

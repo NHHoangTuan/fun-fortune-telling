@@ -5,10 +5,13 @@ import 'data/repositories/quiz_repository_impl.dart';
 import 'domain/entities/quiz_entity.dart';
 import 'domain/entities/quiz_result_entity.dart';
 import 'domain/repositories/quiz_repository.dart';
+import 'domain/usecases/delete_quiz_result_usecase.dart';
 import 'domain/usecases/get_all_quizzes_usecase.dart';
 import 'domain/usecases/get_quiz_by_id_usecase.dart';
 import 'domain/usecases/get_quiz_history_usecase.dart';
+import 'domain/usecases/get_quiz_result_templates_usecase.dart';
 import 'domain/usecases/save_quiz_result_usecase.dart';
+import 'presentation/state/quiz_play_notifier.dart';
 
 // ─── Data Layer ───────────────────────────────────────────
 
@@ -40,6 +43,16 @@ final getQuizHistoryUseCaseProvider = Provider<GetQuizHistoryUseCase>((ref) {
   return GetQuizHistoryUseCase(ref.watch(quizRepositoryProvider));
 });
 
+final deleteQuizResultUseCaseProvider =
+    Provider<DeleteQuizResultUseCase>((ref) {
+  return DeleteQuizResultUseCase(ref.watch(quizRepositoryProvider));
+});
+
+final getQuizResultTemplatesUseCaseProvider =
+    Provider<GetQuizResultTemplatesUseCase>((ref) {
+  return GetQuizResultTemplatesUseCase(ref.watch(quizRepositoryProvider));
+});
+
 // ─── Presentation Layer ───────────────────────────────────
 
 /// FutureProvider tự xử lý async loading/error/data — UI dùng .when() để handle.
@@ -48,14 +61,21 @@ final allQuizzesProvider = FutureProvider<List<QuizEntity>>((ref) {
 });
 
 /// family: tạo provider có tham số — mỗi id tạo 1 instance riêng.
-final quizByIdProvider =
-    FutureProvider.family<QuizEntity, String>((ref, id) {
+final quizByIdProvider = FutureProvider.family<QuizEntity, String>((ref, id) {
   return ref.watch(getQuizByIdUseCaseProvider).execute(id);
 });
 
 final quizHistoryProvider = FutureProvider<List<QuizResultEntity>>((ref) {
   return ref.watch(getQuizHistoryUseCaseProvider).execute();
 });
+
+final quizResultTemplatesProvider =
+    FutureProvider.family<List<QuizResultEntity>, String>((ref, id) {
+  return ref.watch(getQuizResultTemplatesUseCaseProvider).execute(id);
+});
+
+final quizPlayProvider =
+    NotifierProvider<QuizPlayNotifier, QuizPlayState>(QuizPlayNotifier.new);
 
 /// StateProvider: state đơn giản mà UI đọc/ghi trực tiếp.
 /// Lưu Map&lt;questionId, optionValue&gt; — câu trả lời người dùng đã chọn.

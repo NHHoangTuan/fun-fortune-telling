@@ -34,4 +34,10 @@ abstract class QuizRepository {
   ///
   /// Trả về [List<QuizResultEntity>] sắp xếp theo thời gian (mới nhất trước).
   Future<List<QuizResultEntity>> getHistory();
+
+  /// Xoá một kết quả trắc nghiệm khỏi lịch sử.
+  Future<void> deleteResult(QuizResultEntity result);
+
+  /// Lấy danh sách kết quả có thể nhận được của một quiz.
+  Future<List<QuizResultEntity>> getResultTemplates(String quizId);
 }

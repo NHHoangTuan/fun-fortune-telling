@@ -56,6 +56,26 @@ class QuizRepositoryImpl implements QuizRepository {
     return models.map((m) => m.toEntity()).toList();
   }
 
+  @override
+  Future<void> deleteResult(QuizResultEntity result) async {
+    final model = QuizResultModel.fromEntity(result);
+    await _localDataSource.deleteResult(model);
+  }
+
+  @override
+  Future<List<QuizResultEntity>> getResultTemplates(String quizId) async {
+    final map = _resultMapByQuizId(quizId);
+    return map.values
+        .map((r) => QuizResultEntity(
+              quizId: quizId,
+              resultKey: r['resultKey'] as String,
+              title: r['title'] as String,
+              description: r['description'] as String,
+              emoji: r['emoji'] as String,
+            ))
+        .toList();
+  }
+
   // ─── Private helper ───
 
   /// Parse từ Map<String, dynamic> (JSON) → QuizEntity.
@@ -63,19 +83,30 @@ class QuizRepositoryImpl implements QuizRepository {
   QuizEntity _parseQuizMap(Map<String, dynamic> map) {
     // Chuyển đổi nested map về đúng chuẩn Map<String, dynamic> cho json_serializable
     final cleanMap = Map<String, dynamic>.from(map);
-    
+
     final questionMaps = cleanMap['questions'] as List<dynamic>;
     cleanMap['questions'] = questionMaps.map((qMap) {
       final cleanQMap = Map<String, dynamic>.from(qMap as Map);
-      
+
       final optionMaps = cleanQMap['options'] as List<dynamic>;
       cleanQMap['options'] = optionMaps
           .map((oMap) => Map<String, dynamic>.from(oMap as Map))
           .toList();
-          
+
       return cleanQMap;
     }).toList();
 
     return QuizModel.fromJson(cleanMap).toEntity();
+  }
+
+  Map<String, Map<String, dynamic>> _resultMapByQuizId(String quizId) {
+    switch (quizId) {
+      case 'quiz_personality_01':
+        return kPersonalityResults;
+      case 'quiz_career_01':
+        return kCareerResults;
+      default:
+        return const {};
+    }
   }
 }
