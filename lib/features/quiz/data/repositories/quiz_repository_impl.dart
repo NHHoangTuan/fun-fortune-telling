@@ -61,23 +61,21 @@ class QuizRepositoryImpl implements QuizRepository {
   /// Parse từ Map<String, dynamic> (JSON) → QuizEntity.
   /// Logic parse nằm ở đây trong Repository, không rò rỉ ra Use Case hay UI.
   QuizEntity _parseQuizMap(Map<String, dynamic> map) {
-    final questionMaps = map['questions'] as List<dynamic>;
-    final questions = questionMaps.map((qMap) {
-      final optionMaps = qMap['options'] as List<dynamic>;
-      final options = optionMaps
-          .map((o) => OptionModel.fromJson(Map<String, dynamic>.from(o as Map)))
+    // Chuyển đổi nested map về đúng chuẩn Map<String, dynamic> cho json_serializable
+    final cleanMap = Map<String, dynamic>.from(map);
+    
+    final questionMaps = cleanMap['questions'] as List<dynamic>;
+    cleanMap['questions'] = questionMaps.map((qMap) {
+      final cleanQMap = Map<String, dynamic>.from(qMap as Map);
+      
+      final optionMaps = cleanQMap['options'] as List<dynamic>;
+      cleanQMap['options'] = optionMaps
+          .map((oMap) => Map<String, dynamic>.from(oMap as Map))
           .toList();
-      return QuestionModel.fromJson({
-        ...Map<String, dynamic>.from(qMap as Map),
-        'options': options.map((o) => o.toJson()).toList(),
-      });
+          
+      return cleanQMap;
     }).toList();
 
-    final quizModel = QuizModel.fromJson({
-      ...Map<String, dynamic>.from(map),
-      'questions': questions.map((q) => q.toJson()).toList(),
-    });
-
-    return quizModel.toEntity();
+    return QuizModel.fromJson(cleanMap).toEntity();
   }
 }
